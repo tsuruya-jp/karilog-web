@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link } from "@tanstack/react-router";
+import { Link, useSearch } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -18,23 +18,63 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useLogin } from "@/hooks/useAuth";
-import { loginSchema, type LoginFormValues } from "@/schemas/authSchema";
+import { useResetPassword } from "@/hooks/useAuth";
+import {
+  resetPasswordSchema,
+  type ResetPasswordFormValues,
+} from "@/schemas/authSchema";
 
-export function LoginPage() {
-  const { mutate: login, isPending, isError, error } = useLogin();
+export function ResetPasswordPage() {
+  const search = useSearch({ from: "/reset-password" });
+  const token = (search as any)?.token || "";
 
-  const form = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
+  const { mutate: resetPassword, isPending, isError, error } = useResetPassword();
+
+  const form = useForm<ResetPasswordFormValues>({
+    resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
-      email: "",
       password: "",
+      confirmPassword: "",
     },
   });
 
-  const onSubmit = (values: LoginFormValues) => {
-    login(values);
+  const onSubmit = (values: ResetPasswordFormValues) => {
+    resetPassword({
+      token,
+      new_password: values.password,
+    });
   };
+
+  if (!token) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+        <div className="w-full max-w-md">
+          <div className="mb-8 text-center">
+            <h1 className="text-4xl font-bold text-primary mb-2">Karilog</h1>
+            <p className="text-muted-foreground">射撃・狩猟帳簿管理システム</p>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>エラー</CardTitle>
+              <CardDescription>
+                無効なリンクです
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md mb-4">
+                パスワードリセット用のトークンが無効です。メールに記載されたリンクを確認してください。
+              </div>
+
+              <Link to="/forgot-password">
+                <Button className="w-full">パスワードリセット画面へ</Button>
+              </Link>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-background">
@@ -46,9 +86,9 @@ export function LoginPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>ログイン</CardTitle>
+            <CardTitle>パスワード再設定</CardTitle>
             <CardDescription>
-              アカウント情報を入力してログインしてください
+              新しいパスワードを入力してください
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -56,35 +96,16 @@ export function LoginPage() {
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 {isError && (
                   <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md">
-                    {error?.message || "ログインに失敗しました。メールアドレスとパスワードを確認してください。"}
+                    {error?.message || "パスワードリセットに失敗しました。もう一度お試しください。"}
                   </div>
                 )}
-
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>メールアドレス</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="email"
-                          placeholder="example@example.com"
-                          disabled={isPending}
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
 
                 <FormField
                   control={form.control}
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>パスワード</FormLabel>
+                      <FormLabel>新しいパスワード</FormLabel>
                       <FormControl>
                         <Input
                           type="password"
@@ -98,31 +119,38 @@ export function LoginPage() {
                   )}
                 />
 
-                <div className="flex items-center justify-between text-sm">
-                  <Link
-                    to="/forgot-password"
-                    className="text-primary hover:underline"
-                  >
-                    パスワードを忘れた場合
-                  </Link>
-                </div>
+                <FormField
+                  control={form.control}
+                  name="confirmPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>新しいパスワード（確認）</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          placeholder="••••••••"
+                          disabled={isPending}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <Button type="submit" className="w-full" disabled={isPending}>
-                  {isPending ? "ログイン中..." : "ログイン"}
+                  {isPending ? "リセット中..." : "パスワードをリセット"}
                 </Button>
               </form>
             </Form>
 
             <div className="mt-6 text-center text-sm text-muted-foreground">
-              <p>
-                アカウントをお持ちでない方は
-                <Link
-                  to="/register"
-                  className="text-primary hover:underline ml-1"
-                >
-                  新規登録
-                </Link>
-              </p>
+              <Link
+                to="/login"
+                className="text-primary hover:underline"
+              >
+                ログイン画面に戻る
+              </Link>
             </div>
           </CardContent>
         </Card>

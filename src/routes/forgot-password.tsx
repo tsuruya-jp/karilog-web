@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { LoginPage } from "@/pages/auth/LoginPage";
+import { ForgotPasswordPage } from "@/pages/auth/ForgotPasswordPage";
 import { redirectIfAuthenticated } from "@/utils/auth";
 
-export const Route = createFileRoute("/login")({
+export const Route = createFileRoute("/forgot-password")({
   beforeLoad: () => {
     redirectIfAuthenticated();
   },
-  component: LoginPage,
+  component: ForgotPasswordPage,
 });
