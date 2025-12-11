@@ -16,7 +16,7 @@ Karilog Webは射撃・狩猟の帳簿をデジタル管理するWebアプリケ
 - **状態管理**:
   - サーバー状態: TanStack Query
   - クライアント状態: Zustand
-- **UIライブラリ**: shadcn/ui + Tailwind CSS
+- **UIライブラリ**: shadcn/ui + Tailwind CSS（すべてのUIコンポーネントはshadcn/uiを使用）
 - **フォーム**: react-hook-form + Zod
 - **カレンダー**: FullCalendar
 - **HTTP通信**: Axios
@@ -135,6 +135,271 @@ bun --hot ./index.ts
 ```
 
 For more information, read the Bun API docs in `node_modules/bun-types/docs/**.md`.
+
+---
+
+## shadcn/ui使用ガイド
+
+### 基本方針
+
+**すべてのUIコンポーネントはshadcn/uiを使用してください。**
+
+shadcn/uiは、コピー＆ペースト可能なコンポーネント集で、プロジェクトに直接コードを追加する形式です。
+これにより完全なカスタマイズが可能で、依存関係を最小限に抑えられます。
+
+### セットアップ
+
+```bash
+# shadcn/ui CLIを使用してプロジェクトを初期化
+bunx shadcn@latest init
+
+# 必要に応じて、Tailwind CSSとその他の依存関係が自動的にインストールされます
+```
+
+初期化時の設定例:
+- Style: Default
+- Base color: Slate（または好みの色）
+- CSS variables: Yes（推奨）
+- Tailwind config: Yes
+
+### コンポーネントの追加
+
+shadcn/uiのコンポーネントは`src/components/ui/`ディレクトリに追加されます。
+
+```bash
+# ボタンコンポーネントを追加
+bunx shadcn@latest add button
+
+# 複数のコンポーネントを一度に追加
+bunx shadcn@latest add button input label card
+
+# フォーム関連コンポーネント
+bunx shadcn@latest add form input label select checkbox radio-group
+
+# データ表示コンポーネント
+bunx shadcn@latest add table card badge dialog
+
+# ナビゲーションコンポーネント
+bunx shadcn@latest add navigation-menu tabs
+```
+
+### 使用方法
+
+```typescript
+// src/components/LoginForm.tsx
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+export function LoginForm() {
+  return (
+    <Card className="w-[400px]">
+      <CardHeader>
+        <CardTitle>ログイン</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email">メールアドレス</Label>
+            <Input id="email" type="email" placeholder="example@example.com" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">パスワード</Label>
+            <Input id="password" type="password" />
+          </div>
+          <Button type="submit" className="w-full">ログイン</Button>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+### フォームとshadcn/uiの統合
+
+react-hook-formとshadcn/uiのFormコンポーネントを組み合わせて使用します。
+
+```bash
+# フォームコンポーネントを追加
+bunx shadcn@latest add form
+```
+
+```typescript
+// src/components/forms/PurchaseForm.tsx
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Button } from '@/components/ui/button';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+
+const formSchema = z.object({
+  quantity: z.number().int().min(1, '数量は1以上で入力してください'),
+  supplier: z.string().min(1, '購入先を入力してください'),
+});
+
+export function PurchaseForm() {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      quantity: 0,
+      supplier: '',
+    },
+  });
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values);
+  }
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <FormField
+          control={form.control}
+          name="quantity"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>数量</FormLabel>
+              <FormControl>
+                <Input type="number" {...field} />
+              </FormControl>
+              <FormDescription>購入した実包の数量を入力してください</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="supplier"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>購入先</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit">登録</Button>
+      </form>
+    </Form>
+  );
+}
+```
+
+### カスタマイズ
+
+shadcn/uiのコンポーネントは`src/components/ui/`に配置されるため、必要に応じて自由にカスタマイズできます。
+
+#### テーマカスタマイズ
+
+`src/app/globals.css`（またはメインCSSファイル）でCSS変数を編集:
+
+```css
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    /* その他の色変数 */
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    /* ダークモードの色変数 */
+  }
+}
+```
+
+#### 個別コンポーネントのカスタマイズ
+
+`src/components/ui/button.tsx`などを直接編集してバリアントを追加:
+
+```typescript
+const buttonVariants = cva(
+  "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        outline: "border border-input hover:bg-accent hover:text-accent-foreground",
+        // カスタムバリアントを追加
+        success: "bg-green-600 text-white hover:bg-green-700",
+      },
+      size: {
+        default: "h-10 px-4 py-2",
+        sm: "h-9 rounded-md px-3",
+        lg: "h-11 rounded-md px-8",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  }
+);
+```
+
+### 開発ルール
+
+1. **UIコンポーネントは必ずshadcn/uiを使用**
+   - 独自のボタンやインプットを作成しない
+   - shadcn/uiにないコンポーネントのみ独自実装を検討
+
+2. **コンポーネントのインポートパス**
+   - `@/components/ui/*` からインポート
+   - TypeScriptのパスエイリアス設定を確認
+
+3. **スタイリング**
+   - Tailwind CSSのユーティリティクラスを使用
+   - カスタムCSSは最小限に
+   - `className`プロップでスタイルをカスタマイズ
+
+4. **アクセシビリティ**
+   - shadcn/uiコンポーネントは標準でアクセシブル
+   - Radix UIベースで適切なARIA属性が設定済み
+   - フォームではLabelとInputを必ず関連付ける
+
+5. **レスポンシブデザイン**
+   - Tailwindのブレークポイントを活用（sm:, md:, lg:, xl:, 2xl:）
+   - モバイルファーストで設計
+
+### よく使うコンポーネント
+
+開発初期に追加すべきコンポーネント:
+
+```bash
+# 基本コンポーネント
+bunx shadcn@latest add button input label textarea select
+
+# フォーム
+bunx shadcn@latest add form checkbox radio-group switch
+
+# レイアウト
+bunx shadcn@latest add card separator sheet dialog
+
+# ナビゲーション
+bunx shadcn@latest add navigation-menu dropdown-menu tabs
+
+# フィードバック
+bunx shadcn@latest add alert toast badge
+
+# データ表示
+bunx shadcn@latest add table calendar
+```
 
 ---
 
@@ -258,6 +523,7 @@ karilog-web/
    - 単一責任の原則
    - Presentational / Container分離（必要に応じて）
    - Props型定義必須
+   - **UIコンポーネントはshadcn/uiを必ず使用**（独自のボタン・インプット等は作成しない）
 
 ### コミットメッセージ
 
@@ -484,7 +750,16 @@ const PurchaseForm = () => {
 1. `src/schemas/` にZodスキーマ定義
 2. `src/components/forms/` にフォームコンポーネント作成
 3. react-hook-formとzodResolverで統合
-4. バリデーションエラー表示
+4. shadcn/uiのFormコンポーネントを使用
+5. バリデーションエラー表示
+
+### shadcn/uiコンポーネントを追加
+
+1. 必要なコンポーネントを確認（[shadcn/ui公式サイト](https://ui.shadcn.com/)）
+2. CLIでコンポーネントを追加: `bunx shadcn@latest add <component-name>`
+3. `src/components/ui/` に自動生成されたコンポーネントを確認
+4. 必要に応じてカスタマイズ（色、サイズ、バリアント等）
+5. プロジェクト内でインポートして使用: `import { Button } from '@/components/ui/button'`
 
 ---
 
@@ -520,6 +795,7 @@ A: Zodスキーマと型定義が一致しているか確認。`zodResolver`の�
 
 | バージョン | 日付 | 内容 |
 |------------|------|------|
+| 1.4 | 2025-12-09 | shadcn/ui使用ガイドセクションを追加、UIコンポーネント使用ルールを明記 |
 | 1.3 | 2025-12-05 | Claude.mdとCLAUDE.mdを統合、Bun使用ガイドセクションを追加 |
 | 1.2 | 2025-12-04 | パッケージマネージャーをBunに、ビルドツールをFarmに変更 |
 | 1.1 | 2025-12-04 | ルーティングをReact Router v6からTanStack Routerに変更 |
