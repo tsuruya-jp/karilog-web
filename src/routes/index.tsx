@@ -1,28 +1,28 @@
-import { useState } from 'react'
-import { createFileRoute } from '@tanstack/react-router'
-import reactLogo from '../assets/react.svg'
-import FarmLogo from '../assets/logo.png'
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import FarmLogo from "../assets/logo.png";
+import reactLogo from "../assets/react.svg";
 
-export const Route = createFileRoute('/')({
+export const Route = createFileRoute("/")({
   component: HomeComponent,
-})
+});
 
 function HomeComponent() {
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(0);
 
   return (
     <>
       <div>
-        <a href="https://farmfe.org/" target="_blank">
+        <a href="https://farmfe.org/" target="_blank" rel="noopener">
           <img src={FarmLogo} className="logo" alt="Farm logo" />
         </a>
-        <a href="https://react.dev" target="_blank">
+        <a href="https://react.dev" target="_blank" rel="noopener">
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
-      <h1 className='text-red-900'>Farm + React</h1>
+      <h1 className="text-red-900">Farm + React</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
+        <button type="button" onClick={() => setCount((count) => count + 1)}>
           count is {count}
         </button>
         <p>
@@ -33,5 +33,5 @@ function HomeComponent() {
         Click on the Farm and React logos to learn more
       </p>
     </>
-  )
+  );
 }

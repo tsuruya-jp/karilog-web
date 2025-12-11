@@ -1,36 +1,36 @@
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export function LoginPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
 
     try {
       // TODO: API連携実装
-      console.log('Login:', { email, password })
+      console.log("Login:", { email, password });
 
       // 仮の処理
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 1000));
     } catch (error) {
-      console.error('Login error:', error)
+      console.error("Login error:", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-background">
@@ -76,36 +76,36 @@ export function LoginPage() {
               </div>
 
               <div className="flex items-center justify-between text-sm">
-                <a
-                  href="#"
+                <button
+                  type="button"
                   className="text-primary hover:underline"
                   onClick={(e) => {
-                    e.preventDefault()
+                    e.preventDefault();
                     // TODO: パスワードリセット画面へ遷移
                   }}
                 >
                   パスワードを忘れた場合
-                </a>
+                </button>
               </div>
 
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'ログイン中...' : 'ログイン'}
+                {isLoading ? "ログイン中..." : "ログイン"}
               </Button>
             </form>
 
             <div className="mt-6 text-center text-sm text-muted-foreground">
               <p>
                 アカウントをお持ちでない方は
-                <a
-                  href="#"
+                <button
+                  type="button"
                   className="text-primary hover:underline ml-1"
                   onClick={(e) => {
-                    e.preventDefault()
+                    e.preventDefault();
                     // TODO: 登録画面へ遷移
                   }}
                 >
                   新規登録
-                </a>
+                </button>
               </p>
             </div>
           </CardContent>
@@ -116,5 +116,5 @@ export function LoginPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
